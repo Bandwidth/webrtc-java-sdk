@@ -9,15 +9,16 @@ import java.io.IOException;
 import java.util.Base64;
 
 public class WebRtcAuthorizer {
+
     private static OkHttpClient httpClient = new OkHttpClient();
 
-    public static OauthToken getClientCredentials(WebRtcCredentials creds) throws IOException, HttpException {
+    private static String url = "https://id.bandwidth.com/api/v1/oauth2/token";
 
-        String url = "https://id.bandwidth.com/api/v1/oauth2/token";
+    public static OauthToken getClientCredentials(WebRtcCredentials credentials) throws IOException, HttpException {
 
         String mediaType = "application/x-www-form-urlencoded";
 
-        String auth = creds.getUsername() + ":" + creds.getPassword();
+        String auth = credentials.getUsername() + ":" + credentials.getPassword();
 
         String encodedBasicCredential = Base64.getEncoder().encodeToString(auth.getBytes());
 
@@ -39,9 +40,18 @@ public class WebRtcAuthorizer {
         if (response.code() == 401) {
             throw new UnAuthorizedException("Not Authorized getting token");
         } else if (!response.isSuccessful()) {
-            throw new HttpException("Request to get toke unsuccessful, status code: " + response.code());
+            throw new HttpException("Request to get token unsuccessful, status code: " + response.code());
         }
 
         return Helper.deserialize(response.body().string(), OauthToken.class);
     }
+
+    public void setUrl(String url) {
+        WebRtcAuthorizer.url = url;
+    }
+
+    public static void setHttpClient(OkHttpClient httpClient) {
+        WebRtcAuthorizer.httpClient = httpClient;
+    }
+
 }

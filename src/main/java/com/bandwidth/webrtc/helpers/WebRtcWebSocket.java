@@ -31,7 +31,7 @@ public class WebRtcWebSocket extends DefaultJsonRpcHandler<JsonObject> {
 
 
     @Override
-    public void handleRequest(Transaction transaction, Request<JsonObject> request) throws Exception {
+    public void handleRequest(Transaction transaction, Request<JsonObject> request) {
 
         String methodName = request.getMethod();
 

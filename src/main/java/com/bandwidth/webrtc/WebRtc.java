@@ -26,19 +26,23 @@ public class WebRtc {
 
     private JsonRpcClient client;
 
-    private WebRtcWebSocket socketListener = new WebRtcWebSocket();;
+    private WebRtcWebSocket socketListener = new WebRtcWebSocket();
 
     private Gson gson = new Gson();
+
+    private String socketUrl = "wss://server-rtc.rand.bandwidth.com";
+
+    private String sipDestination = "+19192892727";
 
     public WebRtc() {
 
     }
 
-    public void connect(WebRtcCredentials creds) throws IOException, HttpException, Exception {
+    public void connect(WebRtcCredentials creds) throws IOException, HttpException {
 
         WebRtcOptions options = WebRtcOptions.builder()
-                .websocketUrl("wss://server-rtc.rand.bandwidth.com")
-                .sipDestination("+19192892727")
+                .websocketUrl(socketUrl)
+                .sipDestination(sipDestination)
                 .build();
 
         _connect(creds, options);
@@ -46,7 +50,7 @@ public class WebRtc {
 
     }
 
-    private void _connect(WebRtcCredentials creds, WebRtcOptions options) throws IOException, HttpException, Exception {
+    private void _connect(WebRtcCredentials creds, WebRtcOptions options) throws IOException, HttpException {
 
         if (this.authToken == null || this.tokenExpiration == null || this.tokenExpiration < System.currentTimeMillis()) {
             OauthToken token = WebRtcAuthorizer.getClientCredentials(creds);
@@ -193,5 +197,13 @@ public class WebRtc {
 
     public void setOnParticipantUnsubscribed(Consumer<ParticipantUnsubscribedEvent> onParticipantUnsubscribed) {
         this.socketListener.setOnParticipantUnsubscribed(onParticipantUnsubscribed);
+    }
+
+    public void setSocketUrl(String socketUrl) {
+        this.socketUrl = socketUrl;
+    }
+
+    public void setSipDestination(String sipDestination) {
+        this.sipDestination = sipDestination;
     }
 }
