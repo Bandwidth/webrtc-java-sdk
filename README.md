@@ -39,7 +39,7 @@ webRtc.connect(
         .accountId("YOUR_ACCOUNT_ID_HERE")
         .password("YOUR_PASSWORD_HERE")
         .username("YOUR_USERNAME_HERE")
-        .build()
+        .build();
 ```
 
 The next step is to set up some event handlers so you'll get notified when important things are happening.

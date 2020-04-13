@@ -1,15 +1,20 @@
 package com.bandwidth.webrtc.helpers;
 
+import com.bandwidth.webrtc.WebRtc;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.bandwidth.webrtc.models.*;
 import org.kurento.jsonrpc.DefaultJsonRpcHandler;
 import org.kurento.jsonrpc.Transaction;
 import org.kurento.jsonrpc.message.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 
 public class WebRtcWebSocket extends DefaultJsonRpcHandler<JsonObject> {
+
+    private static Logger log = LoggerFactory.getLogger(WebRtcWebSocket.class.getName());
 
     private Consumer<ParticipantJoinedEvent> onParticipantJoined;
 
@@ -78,7 +83,7 @@ public class WebRtcWebSocket extends DefaultJsonRpcHandler<JsonObject> {
                 }
                 break;
             default:
-                System.out.println("Failed for " + methodName);
+                log.error("Failed for " + methodName);
                 break;
         }
     }

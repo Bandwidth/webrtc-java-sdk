@@ -1,7 +1,7 @@
 package com.bandwidth.webrtc.authorization;
 
 import com.bandwidth.webrtc.exceptions.HttpException;
-import com.bandwidth.webrtc.exceptions.UnAuthorizedException;
+import com.bandwidth.webrtc.exceptions.UnauthorizedException;
 import com.bandwidth.webrtc.helpers.Helper;
 import okhttp3.*;
 
@@ -38,7 +38,7 @@ public class WebRtcAuthorizer {
         Response response = httpClient.newCall(request).execute();
 
         if (response.code() == 401) {
-            throw new UnAuthorizedException("Not Authorized getting token");
+            throw new UnauthorizedException("Not Authorized getting token");
         } else if (!response.isSuccessful()) {
             throw new HttpException("Request to get token unsuccessful, status code: " + response.code());
         }

@@ -12,6 +12,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.kurento.jsonrpc.client.JsonRpcClient;
 import org.kurento.jsonrpc.client.JsonRpcClientNettyWebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -19,6 +21,7 @@ import java.util.function.Consumer;
 
 public class WebRtc {
 
+    private static Logger log = LoggerFactory.getLogger(WebRtc.class.getName());
 
     private Long tokenExpiration = null;
 
@@ -30,7 +33,7 @@ public class WebRtc {
 
     private Gson gson = new Gson();
 
-    private String socketUrl = "wss://server-rtc.rand.bandwidth.com";
+    private String socketUrl = "wss://server-rtc.webrtc.bandwidth.com";
 
     private String sipDestination = "+19192892727";
 
@@ -74,7 +77,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("startConference", new JsonObject());
             return gson.fromJson(je, StartConferenceResponse.class);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
 
@@ -92,10 +95,9 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("endConference", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
-
 
 
     public CreateParticipantResponse createParticipant(String conferenceId) {
@@ -106,7 +108,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("createParticipant", jo);
             return gson.fromJson(je, CreateParticipantResponse.class);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -118,7 +120,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("removeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -133,7 +135,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("subscribeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -148,7 +150,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unsubscribeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -163,7 +165,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unpublish", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
