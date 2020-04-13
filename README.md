@@ -12,7 +12,7 @@ Right now, you can download the SDK by cloning this repo:
 
 You will need at least Java 11 and Maven 3 installed to compile the SDK:
 
-    $ cd webrtc-jva-sdk
+    $ cd webrtc-java-sdk
     $ mvn clean install
     
 This will put the SDK in your local M2 cache, and it should be accessible by other Maven projects on your machine now.
@@ -39,7 +39,7 @@ webRtc.connect(
         .accountId("YOUR_ACCOUNT_ID_HERE")
         .password("YOUR_PASSWORD_HERE")
         .username("YOUR_USERNAME_HERE")
-        .build()
+        .build();
 ```
 
 The next step is to set up some event handlers so you'll get notified when important things are happening.

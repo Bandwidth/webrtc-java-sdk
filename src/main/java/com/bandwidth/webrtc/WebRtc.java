@@ -5,13 +5,24 @@ import com.bandwidth.webrtc.authorization.WebRtcAuthorizer;
 import com.bandwidth.webrtc.authorization.WebRtcCredentials;
 import com.bandwidth.webrtc.exceptions.HttpException;
 import com.bandwidth.webrtc.helpers.WebRtcWebSocket;
-import com.bandwidth.webrtc.models.*;
+import com.bandwidth.webrtc.models.CreateParticipantResponse;
+import com.bandwidth.webrtc.models.ParticipantJoinedEvent;
+import com.bandwidth.webrtc.models.ParticipantLeftEvent;
+import com.bandwidth.webrtc.models.ParticipantPublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantSubscribedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnpublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnsubscribedEvent;
+import com.bandwidth.webrtc.models.StartConferenceResponse;
+import com.bandwidth.webrtc.models.SubscribeFailedEvent;
+import com.bandwidth.webrtc.models.SubscribeSucceededEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.kurento.jsonrpc.client.JsonRpcClient;
 import org.kurento.jsonrpc.client.JsonRpcClientNettyWebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -19,6 +30,7 @@ import java.util.function.Consumer;
 
 public class WebRtc {
 
+    private static Logger log = LoggerFactory.getLogger(WebRtc.class.getName());
 
     private Long tokenExpiration = null;
 
@@ -26,19 +38,23 @@ public class WebRtc {
 
     private JsonRpcClient client;
 
-    private WebRtcWebSocket socketListener = new WebRtcWebSocket();;
+    private WebRtcWebSocket socketListener = new WebRtcWebSocket();
 
     private Gson gson = new Gson();
+
+    private String socketUrl = "wss://server-rtc.webrtc.bandwidth.com";
+
+    private String sipDestination = "+19192892727";
 
     public WebRtc() {
 
     }
 
-    public void connect(WebRtcCredentials creds) throws IOException, HttpException, Exception {
+    public void connect(WebRtcCredentials creds) throws IOException, HttpException {
 
         WebRtcOptions options = WebRtcOptions.builder()
-                .websocketUrl("wss://server-rtc.rand.bandwidth.com")
-                .sipDestination("+19192892727")
+                .websocketUrl(socketUrl)
+                .sipDestination(sipDestination)
                 .build();
 
         _connect(creds, options);
@@ -46,7 +62,7 @@ public class WebRtc {
 
     }
 
-    private void _connect(WebRtcCredentials creds, WebRtcOptions options) throws IOException, HttpException, Exception {
+    private void _connect(WebRtcCredentials creds, WebRtcOptions options) throws IOException, HttpException {
 
         if (this.authToken == null || this.tokenExpiration == null || this.tokenExpiration < System.currentTimeMillis()) {
             OauthToken token = WebRtcAuthorizer.getClientCredentials(creds);
@@ -70,7 +86,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("startConference", new JsonObject());
             return gson.fromJson(je, StartConferenceResponse.class);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
 
@@ -88,10 +104,9 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("endConference", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
-
 
 
     public CreateParticipantResponse createParticipant(String conferenceId) {
@@ -102,7 +117,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("createParticipant", jo);
             return gson.fromJson(je, CreateParticipantResponse.class);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }
@@ -114,7 +129,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("removeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -129,7 +144,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("subscribeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -144,7 +159,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unsubscribeParticipant", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -159,7 +174,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unpublish", jo);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -193,5 +208,17 @@ public class WebRtc {
 
     public void setOnParticipantUnsubscribed(Consumer<ParticipantUnsubscribedEvent> onParticipantUnsubscribed) {
         this.socketListener.setOnParticipantUnsubscribed(onParticipantUnsubscribed);
+    }
+
+    public void setOnParticipantSubscribed(Consumer<ParticipantSubscribedEvent> onParticipantSubscribed) {
+        this.socketListener.setOnParticipantSubscribed(onParticipantSubscribed);
+    }
+
+    public void setSocketUrl(String socketUrl) {
+        this.socketUrl = socketUrl;
+    }
+
+    public void setSipDestination(String sipDestination) {
+        this.sipDestination = sipDestination;
     }
 }

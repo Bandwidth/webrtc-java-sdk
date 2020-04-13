@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class Helper {
 
     public static ObjectMapper mapper = new ObjectMapper() {
@@ -20,26 +22,9 @@ public class Helper {
 
     public static <T extends Object> T deserialize(String json, Class<T> clazz)
             throws IOException {
-        if (isNullOrWhiteSpace(json))
+        if (isNullOrEmpty(json))
             return null;
 
         return mapper.readValue(json, clazz);
-    }
-
-    public static boolean isNullOrWhiteSpace(String s) {
-        if (s == null) {
-            return true;
-        }
-
-        int length = s.length();
-        if (length > 0) {
-            for (int start = 0, middle = length / 2, end = length - 1; start <= middle; start++, end--) {
-                if (s.charAt(start) > ' ' || s.charAt(end) > ' ') {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
     }
 }
