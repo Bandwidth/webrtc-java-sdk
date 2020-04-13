@@ -5,7 +5,16 @@ import com.bandwidth.webrtc.authorization.WebRtcAuthorizer;
 import com.bandwidth.webrtc.authorization.WebRtcCredentials;
 import com.bandwidth.webrtc.exceptions.HttpException;
 import com.bandwidth.webrtc.helpers.WebRtcWebSocket;
-import com.bandwidth.webrtc.models.*;
+import com.bandwidth.webrtc.models.CreateParticipantResponse;
+import com.bandwidth.webrtc.models.ParticipantJoinedEvent;
+import com.bandwidth.webrtc.models.ParticipantLeftEvent;
+import com.bandwidth.webrtc.models.ParticipantPublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantSubscribedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnpublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnsubscribedEvent;
+import com.bandwidth.webrtc.models.StartConferenceResponse;
+import com.bandwidth.webrtc.models.SubscribeFailedEvent;
+import com.bandwidth.webrtc.models.SubscribeSucceededEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -199,6 +208,10 @@ public class WebRtc {
 
     public void setOnParticipantUnsubscribed(Consumer<ParticipantUnsubscribedEvent> onParticipantUnsubscribed) {
         this.socketListener.setOnParticipantUnsubscribed(onParticipantUnsubscribed);
+    }
+
+    public void setOnParticipantSubscribed(Consumer<ParticipantSubscribedEvent> onParticipantSubscribed) {
+        this.socketListener.setOnParticipantSubscribed(onParticipantSubscribed);
     }
 
     public void setSocketUrl(String socketUrl) {

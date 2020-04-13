@@ -1,9 +1,15 @@
 package com.bandwidth.webrtc.helpers;
 
-import com.bandwidth.webrtc.WebRtc;
+import com.bandwidth.webrtc.models.ParticipantJoinedEvent;
+import com.bandwidth.webrtc.models.ParticipantLeftEvent;
+import com.bandwidth.webrtc.models.ParticipantPublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantSubscribedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnpublishedEvent;
+import com.bandwidth.webrtc.models.ParticipantUnsubscribedEvent;
+import com.bandwidth.webrtc.models.SubscribeFailedEvent;
+import com.bandwidth.webrtc.models.SubscribeSucceededEvent;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.bandwidth.webrtc.models.*;
 import org.kurento.jsonrpc.DefaultJsonRpcHandler;
 import org.kurento.jsonrpc.Transaction;
 import org.kurento.jsonrpc.message.Request;
@@ -59,7 +65,7 @@ public class WebRtcWebSocket extends DefaultJsonRpcHandler<JsonObject> {
                 break;
             case "participantUnpublished":
                 if (onParticipantUnpublished != null) {
-                   onParticipantUnpublished.accept(gson.fromJson(request.getParams(), ParticipantUnpublishedEvent.class));
+                    onParticipantUnpublished.accept(gson.fromJson(request.getParams(), ParticipantUnpublishedEvent.class));
                 }
                 break;
             case "subscribeSucceeded":
