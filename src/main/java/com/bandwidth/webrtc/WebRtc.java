@@ -42,7 +42,7 @@ public class WebRtc {
 
     private Gson gson = new Gson();
 
-    private String socketUrl = "wss://server-rtc.webrtc.bandwidth.com";
+    private String socketUrl = "wss://server.webrtc.bandwidth.com";
 
     private String sipDestination = "+19192892727";
 
