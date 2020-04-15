@@ -4,6 +4,7 @@ import com.bandwidth.webrtc.authorization.OauthToken;
 import com.bandwidth.webrtc.authorization.WebRtcAuthorizer;
 import com.bandwidth.webrtc.authorization.WebRtcCredentials;
 import com.bandwidth.webrtc.exceptions.HttpException;
+import com.bandwidth.webrtc.helpers.ConnectionListener;
 import com.bandwidth.webrtc.helpers.WebRtcWebSocket;
 import com.bandwidth.webrtc.models.CreateParticipantResponse;
 import com.bandwidth.webrtc.models.ParticipantJoinedEvent;
@@ -25,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.function.Consumer;
 
 
@@ -45,6 +48,8 @@ public class WebRtc {
     private String socketUrl = "wss://server.webrtc.bandwidth.com";
 
     private String sipDestination = "+19192892727";
+
+    private Timer pingTimer;
 
     public WebRtc() {
 
@@ -72,12 +77,25 @@ public class WebRtc {
 
         String webSocketUrl = String.format("%s/v1/?at=c&auth=%s&accountId=%s", options.getWebsocketUrl(), this.authToken, creds.getAccountId());
 
-        this.client = new JsonRpcClientNettyWebSocket(webSocketUrl);
-
+        ConnectionListener connectionListener = new ConnectionListener();
+        connectionListener.setDisconnectedHandler(() -> {
+            if (!this.client.isClosedByUser()) {
+                try {
+                    this.client.close();
+                    this._connect(creds, options);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        this.client = new JsonRpcClientNettyWebSocket(webSocketUrl, connectionListener);
         this.client.connect();
-
         this.client.setServerRequestHandler(socketListener);
-
+        if (this.pingTimer != null) {
+            this.pingTimer.cancel();
+        }
+        this.pingTimer = new Timer();
+        pingTimer.schedule(new Ping(), 240000, 240000);
     }
 
     public StartConferenceResponse startConference() {
@@ -86,7 +104,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("startConference", new JsonObject());
             return gson.fromJson(je, StartConferenceResponse.class);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return null;
         }
 
@@ -104,7 +122,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("endConference", jo);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -117,7 +135,7 @@ public class WebRtc {
             JsonElement je = this.client.sendRequest("createParticipant", jo);
             return gson.fromJson(je, CreateParticipantResponse.class);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return null;
         }
     }
@@ -129,7 +147,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("removeParticipant", jo);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -144,7 +162,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("subscribeParticipant", jo);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -159,7 +177,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unsubscribeParticipant", jo);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -174,7 +192,7 @@ public class WebRtc {
         try {
             JsonElement je = this.client.sendRequest("unpublish", jo);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -220,5 +238,18 @@ public class WebRtc {
 
     public void setSipDestination(String sipDestination) {
         this.sipDestination = sipDestination;
+    }
+
+    private class Ping extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                if (!client.isClosedByUser())
+                client.sendRequest("onTest");
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 }
