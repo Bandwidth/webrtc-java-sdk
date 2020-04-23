@@ -240,13 +240,17 @@ public class WebRtc {
         this.sipDestination = sipDestination;
     }
 
+    public String generateTransferBxml(String conferenceId, String participantId) {
+        return "<Transfer transferCallerId=\"+1" + conferenceId + participantId + "\"><PhoneNumber>" + this.sipDestination + "</PhoneNumber></Transfer>";
+    }
+
     private class Ping extends TimerTask {
 
         @Override
         public void run() {
             try {
                 if (!client.isClosedByUser())
-                client.sendRequest("onTest");
+                    client.sendRequest("onTest");
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
             }
